@@ -93,8 +93,15 @@ export class MemStorage implements IStorage {
   }
 
   private _initializeData() {
-    // Example to initialize some data for development
-    // This would be removed in a production environment with real DB
+    // Add default stream with the Christian radio station URL
+    const defaultStream: Stream = {
+      id: this.currentId.streams++,
+      title: "Grace Waves Christian Radio",
+      streamUrl: "https://radio.brentwooddrivesda.org/listen/bwd_radio/radio.mp3",
+      description: "Live Christian music, sermons, and inspirational programming dedicated to spreading God's word.",
+      isActive: true
+    };
+    this.streams.set(defaultStream.id, defaultStream);
   }
 
   // User methods
