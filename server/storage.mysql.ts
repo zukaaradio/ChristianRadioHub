@@ -203,16 +203,19 @@ export class MySQLStorage implements IStorage {
   
   async createUser(insertUser: InsertUser): Promise<User> {
     // For MySQL, we need to insert first and then get the record
-    const result = await db.insert(users).values(insertUser);
-    const insertId = Number(result.insertId);
-    const [user] = await db.select().from(users).where(eq(users.id, insertId));
+    await db.insert(users).values(insertUser);
+    
+    // Get the user we just created by username
+    const [user] = await db.select().from(users).where(eq(users.username, insertUser.username));
     return user;
   }
   
   async createStream(insertStream: InsertStream): Promise<Stream> {
-    const result = await db.insert(streams).values(insertStream);
-    const insertId = Number(result.insertId);
-    const [stream] = await db.select().from(streams).where(eq(streams.id, insertId));
+    // For MySQL, insert the record and then fetch by title to get the new record
+    await db.insert(streams).values(insertStream);
+    
+    // Get the stream we just created by title
+    const [stream] = await db.select().from(streams).where(eq(streams.title, insertStream.title));
     return stream;
   }
   
@@ -240,8 +243,16 @@ export class MySQLStorage implements IStorage {
   }
   
   async deleteStream(id: number): Promise<boolean> {
-    const result = await db.delete(streams).where(eq(streams.id, id));
-    return result.rowsAffected > 0;
+    // First check if the stream exists
+    const existingStream = await this.getStream(id);
+    if (!existingStream) return false;
+    
+    // Delete the stream
+    await db.delete(streams).where(eq(streams.id, id));
+    
+    // Verify it was deleted
+    const deleted = await this.getStream(id);
+    return !deleted;
   }
   
   async setStreamActive(id: number, active: boolean): Promise<boolean> {
@@ -257,9 +268,15 @@ export class MySQLStorage implements IStorage {
   }
   
   async createShow(insertShow: InsertShow): Promise<Show> {
-    const result = await db.insert(shows).values(insertShow);
-    const insertId = Number(result.insertId);
-    const [show] = await db.select().from(shows).where(eq(shows.id, insertId));
+    // For MySQL, insert the record and then fetch by title to get the new record
+    await db.insert(shows).values(insertShow);
+    
+    // Get the show we just created by title and host
+    const [show] = await db.select().from(shows)
+      .where(and(
+        eq(shows.title, insertShow.title),
+        eq(shows.host, insertShow.host)
+      ));
     return show;
   }
   
@@ -286,9 +303,16 @@ export class MySQLStorage implements IStorage {
   }
   
   async createSchedule(insertSchedule: InsertSchedule): Promise<Schedule> {
-    const result = await db.insert(schedules).values(insertSchedule);
-    const insertId = Number(result.insertId);
-    const [schedule] = await db.select().from(schedules).where(eq(schedules.id, insertId));
+    // Insert the schedule
+    await db.insert(schedules).values(insertSchedule);
+    
+    // Get the schedule we just created by showId and start/end times
+    const [schedule] = await db.select().from(schedules)
+      .where(and(
+        eq(schedules.showId, insertSchedule.showId),
+        eq(schedules.startTime, insertSchedule.startTime),
+        eq(schedules.endTime, insertSchedule.endTime)
+      ));
     return schedule;
   }
   
