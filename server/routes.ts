@@ -7,6 +7,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { z } from "zod";
+import { promises as fsPromises } from 'fs';
 
 // Set up multer storage for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -386,6 +387,219 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ message: "Error fetching analytics", error: (error as Error).message });
     }
+  });
+  
+  // AI Voice Services
+  
+  // Ensure TTS output directory exists
+  const TTS_OUTPUT_DIR = process.env.TTS_OUTPUT_DIR || './uploads/tts';
+  async function ensureTTSOutputDirExists() {
+    try {
+      await fsPromises.mkdir(TTS_OUTPUT_DIR, { recursive: true });
+    } catch (error) {
+      console.error(`Error creating TTS output directory: ${(error as Error).message}`);
+    }
+  }
+  
+  // Initialize the TTS output directory
+  ensureTTSOutputDirExists();
+  
+  // Show introduction announcement
+  app.post("/api/ai-voice/show-intro", async (req, res) => {
+    try {
+      const { showId, voice, includeVerse } = req.body;
+      
+      if (!showId) {
+        return res.status(400).json({ message: 'Show ID is required' });
+      }
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateShowIntro(
+        parseInt(showId),
+        voice || 'nova', 
+        includeVerse || false
+      );
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in show intro API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Show outro announcement
+  app.post("/api/ai-voice/show-outro", async (req, res) => {
+    try {
+      const { showId, voice } = req.body;
+      
+      if (!showId) {
+        return res.status(400).json({ message: 'Show ID is required' });
+      }
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateShowOutro(
+        parseInt(showId),
+        voice || 'nova'
+      );
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in show outro API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Verse announcement
+  app.post("/api/ai-voice/verse", async (req, res) => {
+    try {
+      const { voice } = req.body;
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateVerseAnnouncement(voice || 'nova');
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in verse API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // News announcement
+  app.post("/api/ai-voice/news", async (req, res) => {
+    try {
+      const { voice } = req.body;
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateNewsAnnouncement(voice || 'nova');
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in news API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Station ID announcement
+  app.post("/api/ai-voice/station-id", async (req, res) => {
+    try {
+      const { voice } = req.body;
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateStationId(voice || 'nova');
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in station ID API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Devotional announcement
+  app.post("/api/ai-voice/devotional", async (req, res) => {
+    try {
+      const { voice } = req.body;
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateDevotional(voice || 'nova');
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in devotional API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Custom announcement
+  app.post("/api/ai-voice/custom", async (req, res) => {
+    try {
+      const { prompt, voice, includeVerse, includeTrending } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ message: 'Prompt is required' });
+      }
+      
+      const aiVoiceService = await import('./services/ai-voice-service');
+      const result = await aiVoiceService.default.generateCustomAnnouncement(
+        prompt,
+        voice || 'nova',
+        {
+          includeVerse: includeVerse || false,
+          includeTrending: includeTrending || false
+        }
+      );
+      
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(`Error in custom API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Get audio file
+  app.get("/api/ai-voice/audio/:filename", async (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const filePath = path.join(TTS_OUTPUT_DIR, filename);
+      
+      // Check if file exists
+      try {
+        await fsPromises.access(filePath);
+      } catch (error) {
+        return res.status(404).json({ message: 'Audio file not found' });
+      }
+      
+      // Stream the file
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error) {
+      console.error(`Error in audio API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Get trending topics
+  app.get("/api/ai-voice/trending", async (req, res) => {
+    try {
+      const count = req.query.count ? parseInt(req.query.count as string) : 5;
+      
+      const rssService = (await import('./services/rss-service')).default;
+      const topics = await rssService.getTrendingTopics(count);
+      
+      return res.status(200).json({ topics });
+    } catch (error) {
+      console.error(`Error in trending API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Get daily verse
+  app.get("/api/ai-voice/daily-verse", async (req, res) => {
+    try {
+      const bibleService = (await import('./services/bible-service')).default;
+      const verse = await bibleService.getVerseOfTheDay();
+      
+      return res.status(200).json(verse);
+    } catch (error) {
+      console.error(`Error in daily verse API: ${(error as Error).message}`);
+      return res.status(500).json({ message: (error as Error).message });
+    }
+  });
+  
+  // Get available voices
+  app.get("/api/ai-voice/voices", (_req, res) => {
+    const voices = [
+      { id: 'alloy', name: 'Alloy', description: 'Versatile, general purpose voice' },
+      { id: 'echo', name: 'Echo', description: 'Balanced and clear voice' },
+      { id: 'fable', name: 'Fable', description: 'Expressive storytelling voice' },
+      { id: 'onyx', name: 'Onyx', description: 'Deep, authoritative voice' },
+      { id: 'nova', name: 'Nova', description: 'Warm, pleasant female voice' },
+      { id: 'shimmer', name: 'Shimmer', description: 'Calming, gentle voice' }
+    ];
+    
+    return res.status(200).json({ voices });
   });
   
   app.get("/api/analytics/listener-stats", async (req, res) => {

@@ -14,8 +14,8 @@ if (isDevEnvironment) {
   log(`Development environment detected. Using in-memory database for testing.`);
   
   // Mock MySQL interface for development
-  const { createPool } = require('mysql2/promise');
-  connectionPool = createPool({
+  // Use the already imported mysql
+  connectionPool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'password',
@@ -26,10 +26,34 @@ if (isDevEnvironment) {
   
   // Create a mock DB implementation that will work with the interface
   db = {
-    select: () => ({ from: () => [] }),
-    insert: () => ({ values: () => ({ returning: () => [{ id: 1 }] }) }),
-    update: () => ({ set: () => ({ where: () => ({ returning: () => [{ id: 1 }] }) }) }),
-    delete: () => ({ where: () => ({ returning: () => true }) }),
+    select: () => ({ 
+      from: () => ({ 
+        where: () => [],
+        orderBy: () => ({ limit: () => [] }),
+        limit: () => []
+      })
+    }),
+    insert: () => ({ 
+      values: () => ({ 
+        returning: () => [{ id: 1 }],
+        rowsAffected: 1,
+        insertId: 1
+      }) 
+    }),
+    update: () => ({ 
+      set: () => ({ 
+        where: () => ({
+          returning: () => [{ id: 1 }],
+          rowsAffected: 1
+        }) 
+      }) 
+    }),
+    delete: () => ({ 
+      where: () => ({ 
+        returning: () => true,
+        rowsAffected: 1 
+      }) 
+    }),
     // Add other mock methods as needed
   };
 } else {

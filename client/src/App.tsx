@@ -16,6 +16,7 @@ import MediaPage from "@/pages/media-page";
 import AnalyticsPage from "@/pages/analytics-page";
 import SettingsPage from "@/pages/settings-page";
 import HomePage from "@/pages/home-page";
+import VoiceAnnouncementsPage from "@/pages/voice-announcements-page";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <ProtectedRoute path="/schedule" component={SchedulePage} />
       <ProtectedRoute path="/media" component={MediaPage} />
       <ProtectedRoute path="/analytics" component={AnalyticsPage} />
+      <ProtectedRoute path="/voice-announcements" component={VoiceAnnouncementsPage} />
       <ProtectedRoute path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>

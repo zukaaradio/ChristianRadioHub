@@ -8,6 +8,7 @@ import { db, pool } from "./db.mysql";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
 import session from "express-session";
 import mysqlStoreFactory from "express-mysql-session";
+import createMemoryStore from "memorystore";
 
 export interface IStorage {
   // User management
@@ -72,8 +73,8 @@ const isDevEnvironment = process.env.NODE_ENV === 'development' && process.env.R
 let SessionStore;
 if (isDevEnvironment) {
   // For development on Replit, use in-memory session store
-  const createMemoryStore = require('memorystore');
-  SessionStore = createMemoryStore(session);
+  const MemoryStore = createMemoryStore(session);
+  SessionStore = MemoryStore;
   log('Using in-memory session store for development');
 } else {
   // For production on your server, use MySQL session store
