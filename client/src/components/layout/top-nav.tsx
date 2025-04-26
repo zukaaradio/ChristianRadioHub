@@ -15,6 +15,7 @@ import {
 import Sidebar from "./sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export default function TopNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +55,9 @@ export default function TopNav() {
             </div>
           </form>
         </div>
-        <div className="ml-4 flex items-center md:ml-6">
+        <div className="ml-4 flex items-center md:ml-6 space-x-2">
+          <ThemeToggle />
+          
           <Button
             variant="ghost"
             size="icon"
