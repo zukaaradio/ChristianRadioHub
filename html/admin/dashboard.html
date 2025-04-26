@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Grace Waves Radio</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-cross"></i>
+                <h1>Grace Waves Radio</h1>
+            </div>
+            <div>
+                <button id="logout-btn" class="btn" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-dashboard">
+            <aside class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <nav class="admin-menu">
+                    <a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="streams.html"><i class="fas fa-broadcast-tower"></i> Streams</a>
+                    <a href="shows.html"><i class="fas fa-headphones"></i> Shows</a>
+                    <a href="schedule.html"><i class="fas fa-calendar-alt"></i> Schedule</a>
+                    <a href="media.html"><i class="fas fa-photo-video"></i> Media</a>
+                    <a href="voice-announcements.html"><i class="fas fa-microphone"></i> Voice Announcements</a>
+                    <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                </nav>
+            </aside>
+
+            <main class="admin-content">
+                <h2 class="admin-title">Dashboard</h2>
+                
+                <div class="dashboard-stats">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Current Listeners</h3>
+                        </div>
+                        <div class="stat-value" id="current-listeners">-</div>
+                        <div class="stat-label">Tuned in now</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Peak Listeners</h3>
+                        </div>
+                        <div class="stat-value" id="peak-listeners">-</div>
+                        <div class="stat-label">Today's peak</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Active Shows</h3>
+                        </div>
+                        <div class="stat-value" id="active-shows">-</div>
+                        <div class="stat-label">In rotation</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Storage Used</h3>
+                        </div>
+                        <div class="stat-value" id="storage-used">-</div>
+                        <div class="stat-label">Media storage</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Shows</h3>
+                        <a href="schedule.html" class="btn secondary btn-sm">View All</a>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Show</th>
+                                <th>Host</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcoming-shows-table">
+                            <!-- Will be populated by JavaScript -->
+                            <tr>
+                                <td colspan="5" class="loading-message">Loading upcoming shows...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recently Added Media</h3>
+                        <a href="media.html" class="btn secondary btn-sm">View All</a>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Date Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-media-table">
+                            <!-- Will be populated by JavaScript -->
+                            <tr>
+                                <td colspan="5" class="loading-message">Loading recent media...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Grace Waves Radio. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            function checkAuth() {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                }
+                
+                // You may also validate the token with the server here
+            }
+            
+            // Logout function
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('auth_token');
+                window.location.href = 'login.html';
+            });
+            
+            // Fetch dashboard stats
+            async function fetchDashboardStats() {
+                try {
+                    const response = await fetch('api/dashboard-stats.php');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch dashboard stats');
+                    }
+                    
+                    const stats = await response.json();
+                    
+                    // Update stats on the page
+                    document.getElementById('current-listeners').textContent = stats.currentListeners || '0';
+                    document.getElementById('peak-listeners').textContent = stats.peakListeners || '0';
+                    document.getElementById('active-shows').textContent = stats.activeShows || '0';
+                    document.getElementById('storage-used').textContent = stats.storageUsed || '0 KB';
+                    
+                } catch (error) {
+                    console.error('Error fetching dashboard stats:', error);
+                }
+            }
+            
+            // Fetch upcoming shows
+            async function fetchUpcomingShows() {
+                const tableBody = document.getElementById('upcoming-shows-table');
+                
+                try {
+                    const response = await fetch('api/upcoming-shows.php');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch upcoming shows');
+                    }
+                    
+                    const shows = await response.json();
+                    
+                    // Clear table
+                    tableBody.innerHTML = '';
+                    
+                    if (shows.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5">No upcoming shows scheduled</td></tr>';
+                        return;
+                    }
+                    
+                    // Add shows to table
+                    shows.slice(0, 5).forEach(show => {
+                        const startDate = new Date(show.startTime);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${show.title}</td>
+                            <td>${show.host}</td>
+                            <td>${formatDate(startDate)}</td>
+                            <td>${formatTime(startDate)}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="schedule-edit.html?id=${show.id}" class="btn primary btn-sm">Edit</a>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error fetching upcoming shows:', error);
+                    tableBody.innerHTML = '<tr><td colspan="5">Error loading upcoming shows</td></tr>';
+                }
+            }
+            
+            // Fetch recent media
+            async function fetchRecentMedia() {
+                const tableBody = document.getElementById('recent-media-table');
+                
+                try {
+                    const response = await fetch('api/recent-media.php');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch recent media');
+                    }
+                    
+                    const mediaItems = await response.json();
+                    
+                    // Clear table
+                    tableBody.innerHTML = '';
+                    
+                    if (mediaItems.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5">No media items found</td></tr>';
+                        return;
+                    }
+                    
+                    // Add media items to table
+                    mediaItems.slice(0, 5).forEach(item => {
+                        const uploadDate = new Date(item.uploadDate);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.title}</td>
+                            <td>${item.type}</td>
+                            <td>${formatFileSize(item.size)}</td>
+                            <td>${formatDate(uploadDate)}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="${item.url}" class="btn primary btn-sm" target="_blank">View</a>
+                                    <button class="btn error btn-sm" data-id="${item.id}" data-action="delete">Delete</button>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                    
+                    // Add event listeners for delete buttons
+                    document.querySelectorAll('[data-action="delete"]').forEach(button => {
+                        button.addEventListener('click', async function() {
+                            if (confirm('Are you sure you want to delete this item?')) {
+                                const id = this.getAttribute('data-id');
+                                try {
+                                    const response = await fetch(`api/delete-media.php?id=${id}`, {
+                                        method: 'DELETE'
+                                    });
+                                    
+                                    if (response.ok) {
+                                        // Remove row from table
+                                        this.closest('tr').remove();
+                                    } else {
+                                        alert('Failed to delete item');
+                                    }
+                                } catch (error) {
+                                    console.error('Error deleting media:', error);
+                                    alert('An error occurred while deleting the item');
+                                }
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error fetching recent media:', error);
+                    tableBody.innerHTML = '<tr><td colspan="5">Error loading recent media</td></tr>';
+                }
+            }
+            
+            // Utility function to format date
+            function formatDate(date) {
+                const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+            
+            // Utility function to format time
+            function formatTime(date) {
+                const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+                return date.toLocaleTimeString('en-US', options);
+            }
+            
+            // Utility function to format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Mock data for testing
+            function loadMockData() {
+                // Mock stats
+                document.getElementById('current-listeners').textContent = '68';
+                document.getElementById('peak-listeners').textContent = '142';
+                document.getElementById('active-shows').textContent = '12';
+                document.getElementById('storage-used').textContent = '28.4 GB';
+                
+                // Mock upcoming shows
+                const upcomingShowsTable = document.getElementById('upcoming-shows-table');
+                upcomingShowsTable.innerHTML = `
+                    <tr>
+                        <td>Morning Devotional</td>
+                        <td>Pastor David Johnson</td>
+                        <td>Tomorrow</td>
+                        <td>9:00 AM</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="schedule-edit.html?id=1" class="btn primary btn-sm">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Gospel Hour</td>
+                        <td>Sister Mary Thompson</td>
+                        <td>Sat, Apr 27</td>
+                        <td>2:00 PM</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="schedule-edit.html?id=2" class="btn primary btn-sm">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Biblical Insights</td>
+                        <td>Dr. Robert Winters</td>
+                        <td>Sun, Apr 28</td>
+                        <td>11:00 AM</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="schedule-edit.html?id=3" class="btn primary btn-sm">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                // Mock recent media
+                const recentMediaTable = document.getElementById('recent-media-table');
+                recentMediaTable.innerHTML = `
+                    <tr>
+                        <td>Sermon - Finding Peace in Troubled Times</td>
+                        <td>Audio</td>
+                        <td>24.5 MB</td>
+                        <td>Apr 24, 2025</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="#" class="btn primary btn-sm">View</a>
+                                <button class="btn error btn-sm" data-id="1" data-action="delete">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Easter Service Flyer</td>
+                        <td>Image</td>
+                        <td>1.8 MB</td>
+                        <td>Apr 22, 2025</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="#" class="btn primary btn-sm">View</a>
+                                <button class="btn error btn-sm" data-id="2" data-action="delete">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Bible Study - The Book of Psalms</td>
+                        <td>Document</td>
+                        <td>3.2 MB</td>
+                        <td>Apr 20, 2025</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="#" class="btn primary btn-sm">View</a>
+                                <button class="btn error btn-sm" data-id="3" data-action="delete">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Initialize
+            checkAuth();
+            
+            // Comment these out when API is ready
+            loadMockData();
+            
+            // Uncomment these when API is ready
+            // fetchDashboardStats();
+            // fetchUpcomingShows();
+            // fetchRecentMedia();
+            
+            // Set up auto-refresh for real-time stats
+            // setInterval(fetchDashboardStats, 60000); // Every minute
+        });
+    </script>
+</body>
+</html>

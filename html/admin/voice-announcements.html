@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Announcements - Grace Waves Radio</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-cross"></i>
+                <h1>Grace Waves Radio</h1>
+            </div>
+            <div>
+                <button id="logout-btn" class="btn" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="admin-dashboard">
+            <aside class="admin-sidebar">
+                <h3>Admin Panel</h3>
+                <nav class="admin-menu">
+                    <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="streams.html"><i class="fas fa-broadcast-tower"></i> Streams</a>
+                    <a href="shows.html"><i class="fas fa-headphones"></i> Shows</a>
+                    <a href="schedule.html"><i class="fas fa-calendar-alt"></i> Schedule</a>
+                    <a href="media.html"><i class="fas fa-photo-video"></i> Media</a>
+                    <a href="voice-announcements.html" class="active"><i class="fas fa-microphone"></i> Voice Announcements</a>
+                    <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                </nav>
+            </aside>
+
+            <main class="admin-content">
+                <h2 class="admin-title">AI Voice Announcements</h2>
+                
+                <div class="card voice-announcements">
+                    <div class="tabs">
+                        <button class="tab-button active" data-tab="custom">Custom</button>
+                        <button class="tab-button" data-tab="show-intro">Show Intro</button>
+                        <button class="tab-button" data-tab="show-outro">Show Outro</button>
+                        <button class="tab-button" data-tab="verse">Daily Verse</button>
+                        <button class="tab-button" data-tab="news">News Update</button>
+                        <button class="tab-button" data-tab="station-id">Station ID</button>
+                        <button class="tab-button" data-tab="devotional">Devotional</button>
+                    </div>
+                    
+                    <!-- Custom Announcement Tab -->
+                    <div class="tab-content active" id="tab-custom">
+                        <h3>Create Custom Announcement</h3>
+                        <p>Generate a custom announcement with your own script.</p>
+                        
+                        <form id="custom-form" class="form">
+                            <div class="form-group">
+                                <label for="custom-prompt">Announcement Script</label>
+                                <textarea id="custom-prompt" name="prompt" rows="5" placeholder="Write your announcement script here..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="custom-voice">Voice</label>
+                                <select id="custom-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="custom-verse" name="includeVerse">
+                                    <label for="custom-verse">Include daily verse</label>
+                                </div>
+                                
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="custom-trending" name="includeTrending">
+                                    <label for="custom-trending">Include trending topics</label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="custom-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Announcement
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Show Intro Tab -->
+                    <div class="tab-content" id="tab-show-intro">
+                        <h3>Generate Show Introduction</h3>
+                        <p>Create an introduction for one of your shows.</p>
+                        
+                        <form id="show-intro-form" class="form">
+                            <div class="form-group">
+                                <label for="intro-show">Show</label>
+                                <select id="intro-show" name="showId" required>
+                                    <option value="">Select a show</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="intro-voice">Voice</label>
+                                <select id="intro-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="intro-verse" name="includeVerse">
+                                    <label for="intro-verse">Include daily verse</label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="intro-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Introduction
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Show Outro Tab -->
+                    <div class="tab-content" id="tab-show-outro">
+                        <h3>Generate Show Conclusion</h3>
+                        <p>Create a conclusion for one of your shows.</p>
+                        
+                        <form id="show-outro-form" class="form">
+                            <div class="form-group">
+                                <label for="outro-show">Show</label>
+                                <select id="outro-show" name="showId" required>
+                                    <option value="">Select a show</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="outro-voice">Voice</label>
+                                <select id="outro-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="outro-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Conclusion
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Verse Tab -->
+                    <div class="tab-content" id="tab-verse">
+                        <h3>Generate Verse Announcement</h3>
+                        <p>Create an announcement with the daily Bible verse.</p>
+                        
+                        <form id="verse-form" class="form">
+                            <div class="form-group">
+                                <label for="verse-voice">Voice</label>
+                                <select id="verse-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="verse-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Verse Announcement
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- News Tab -->
+                    <div class="tab-content" id="tab-news">
+                        <h3>Generate News Update</h3>
+                        <p>Create an announcement with trending Christian news topics.</p>
+                        
+                        <form id="news-form" class="form">
+                            <div class="form-group">
+                                <label for="news-voice">Voice</label>
+                                <select id="news-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="news-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate News Update
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Station ID Tab -->
+                    <div class="tab-content" id="tab-station-id">
+                        <h3>Generate Station ID</h3>
+                        <p>Create a station identification announcement.</p>
+                        
+                        <form id="station-id-form" class="form">
+                            <div class="form-group">
+                                <label for="station-id-voice">Voice</label>
+                                <select id="station-id-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="station-id-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Station ID
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Devotional Tab -->
+                    <div class="tab-content" id="tab-devotional">
+                        <h3>Generate Devotional Moment</h3>
+                        <p>Create a short devotional message.</p>
+                        
+                        <form id="devotional-form" class="form">
+                            <div class="form-group">
+                                <label for="devotional-voice">Voice</label>
+                                <select id="devotional-voice" name="voice">
+                                    <option value="alloy">Alloy - Versatile, general purpose voice</option>
+                                    <option value="echo">Echo - Balanced and clear voice</option>
+                                    <option value="fable">Fable - Expressive storytelling voice</option>
+                                    <option value="onyx">Onyx - Deep, authoritative voice</option>
+                                    <option value="nova" selected>Nova - Warm, pleasant female voice</option>
+                                    <option value="shimmer">Shimmer - Calming, gentle voice</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn primary" id="devotional-generate-btn">
+                                <i class="fas fa-microphone"></i> Generate Devotional
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Announcement Preview Section (Hidden by default) -->
+                    <div class="announcement-preview" id="announcement-preview" style="display: none;">
+                        <h3 class="preview-title">Generated Announcement</h3>
+                        
+                        <div class="preview-script" id="announcement-script">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="audio-controls">
+                            <button class="btn primary" id="play-audio">
+                                <i class="fas fa-play"></i> Play
+                            </button>
+                            
+                            <a href="#" class="btn secondary" id="download-audio" download>
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                        
+                        <audio id="audio-element" style="display: none;"></audio>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Grace Waves Radio. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const customForm = document.getElementById('custom-form');
+            const showIntroForm = document.getElementById('show-intro-form');
+            const showOutroForm = document.getElementById('show-outro-form');
+            const verseForm = document.getElementById('verse-form');
+            const newsForm = document.getElementById('news-form');
+            const stationIdForm = document.getElementById('station-id-form');
+            const devotionalForm = document.getElementById('devotional-form');
+            const announcementPreview = document.getElementById('announcement-preview');
+            const announcementScript = document.getElementById('announcement-script');
+            const playAudioBtn = document.getElementById('play-audio');
+            const downloadAudioLink = document.getElementById('download-audio');
+            const audioElement = document.getElementById('audio-element');
+            
+            // Check authentication
+            function checkAuth() {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                }
+            }
+            
+            // Tab functionality
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Hide preview when switching tabs
+                    announcementPreview.style.display = 'none';
+                    
+                    // Remove active class from all tabs
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to selected tab
+                    button.classList.add('active');
+                    const tabId = 'tab-' + button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Fetch shows for dropdowns
+            async function fetchShows() {
+                try {
+                    const response = await fetch('api/shows.php');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch shows');
+                    }
+                    
+                    const shows = await response.json();
+                    populateShowDropdowns(shows);
+                    
+                } catch (error) {
+                    console.error('Error fetching shows:', error);
+                    // Load mock shows for testing
+                    const mockShows = [
+                        { id: 1, title: 'Morning Devotional', host: 'Pastor David Johnson' },
+                        { id: 2, title: 'Gospel Hour', host: 'Sister Mary Thompson' },
+                        { id: 3, title: 'Biblical Insights', host: 'Dr. Robert Winters' }
+                    ];
+                    populateShowDropdowns(mockShows);
+                }
+            }
+            
+            // Populate show dropdowns
+            function populateShowDropdowns(shows) {
+                const introShowSelect = document.getElementById('intro-show');
+                const outroShowSelect = document.getElementById('outro-show');
+                
+                shows.forEach(show => {
+                    const option = document.createElement('option');
+                    option.value = show.id;
+                    option.textContent = `${show.title} with ${show.host}`;
+                    
+                    // Clone for both dropdowns
+                    introShowSelect.appendChild(option);
+                    outroShowSelect.appendChild(option.cloneNode(true));
+                });
+            }
+            
+            // Handle form submissions
+            
+            // Custom announcement
+            customForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(customForm);
+                const data = {
+                    prompt: formData.get('prompt'),
+                    voice: formData.get('voice'),
+                    includeVerse: formData.has('includeVerse'),
+                    includeTrending: formData.has('includeTrending')
+                };
+                
+                generateAnnouncement('custom', data);
+            });
+            
+            // Show intro
+            showIntroForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(showIntroForm);
+                const data = {
+                    showId: formData.get('showId'),
+                    voice: formData.get('voice'),
+                    includeVerse: formData.has('includeVerse')
+                };
+                
+                generateAnnouncement('show-intro', data);
+            });
+            
+            // Show outro
+            showOutroForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(showOutroForm);
+                const data = {
+                    showId: formData.get('showId'),
+                    voice: formData.get('voice')
+                };
+                
+                generateAnnouncement('show-outro', data);
+            });
+            
+            // Verse announcement
+            verseForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(verseForm);
+                const data = {
+                    voice: formData.get('voice')
+                };
+                
+                generateAnnouncement('verse', data);
+            });
+            
+            // News update
+            newsForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(newsForm);
+                const data = {
+                    voice: formData.get('voice')
+                };
+                
+                generateAnnouncement('news', data);
+            });
+            
+            // Station ID
+            stationIdForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(stationIdForm);
+                const data = {
+                    voice: formData.get('voice')
+                };
+                
+                generateAnnouncement('station-id', data);
+            });
+            
+            // Devotional
+            devotionalForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(devotionalForm);
+                const data = {
+                    voice: formData.get('voice')
+                };
+                
+                generateAnnouncement('devotional', data);
+            });
+            
+            // Generate announcement
+            async function generateAnnouncement(type, data) {
+                // Show loading state
+                const submitBtn = document.querySelector(`#tab-${type} button[type="submit"]`);
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                submitBtn.disabled = true;
+                
+                try {
+                    const response = await fetch(`api/voice-announcements/${type}.php`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to generate announcement');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Display the announcement
+                    announcementScript.textContent = result.scriptText;
+                    audioElement.src = result.audioPath;
+                    downloadAudioLink.href = result.audioPath;
+                    
+                    // Show the preview section
+                    announcementPreview.style.display = 'block';
+                    
+                    // Scroll to preview
+                    announcementPreview.scrollIntoView({ behavior: 'smooth' });
+                    
+                } catch (error) {
+                    console.error(`Error generating ${type} announcement:`, error);
+                    alert(`Failed to generate announcement: ${error.message}`);
+                    
+                    // For testing - mock response
+                    mockAnnouncementGeneration(type);
+                    
+                } finally {
+                    // Reset button state
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }
+            }
+            
+            // Handle audio playback
+            playAudioBtn.addEventListener('click', function() {
+                if (audioElement.paused) {
+                    audioElement.play()
+                        .then(() => {
+                            playAudioBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                        })
+                        .catch(error => {
+                            console.error('Error playing audio:', error);
+                            alert('Error playing audio. Please try again.');
+                        });
+                } else {
+                    audioElement.pause();
+                    playAudioBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                }
+            });
+            
+            // Reset play button when audio ends
+            audioElement.addEventListener('ended', function() {
+                playAudioBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            });
+            
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('auth_token');
+                window.location.href = 'login.html';
+            });
+            
+            // Mock announcement generation for testing
+            function mockAnnouncementGeneration(type) {
+                let scriptText = '';
+                
+                switch (type) {
+                    case 'custom':
+                        scriptText = 'Welcome to Grace Waves Christian Radio, where faith flows through the airwaves. We hope you\'re having a blessed day as you tune in to uplifting music and inspiring messages. Stay with us as we continue our programming designed to strengthen your faith and lift your spirit.';
+                        break;
+                    case 'show-intro':
+                        scriptText = 'Good morning, listeners! Welcome to Morning Devotional with Pastor David Johnson. Today, we\'ll be exploring the theme of hope in difficult times. Our verse of the day comes from Romans 15:13, "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit." Stay tuned for inspiration and guidance to start your day right.';
+                        break;
+                    case 'show-outro':
+                        scriptText = 'Thank you for joining us for another edition of Morning Devotional with Pastor David Johnson. We hope today\'s message on hope has encouraged your heart. Join us again tomorrow at 9 AM for more spiritual insights. This is Grace Waves Christian Radio, where faith flows through the airwaves.';
+                        break;
+                    case 'verse':
+                        scriptText = 'Today\'s verse of the day comes from Psalm 46:10, "Be still, and know that I am God; I will be exalted among the nations, I will be exalted in the earth." Take a moment today to be still in God\'s presence and recognize His sovereignty over all things. This is Grace Waves Christian Radio, bringing you daily inspiration from God\'s Word.';
+                        break;
+                    case 'news':
+                        scriptText = 'Christian News Update: Churches across the nation are coming together this weekend for a special prayer initiative focused on community healing and unity. The annual Christian Music Awards have announced their nominees, with several new artists receiving recognition for their inspiring work. A new Bible translation project has completed work on bringing Scripture to a previously unreached language group. Stay informed with Grace Waves Christian Radio.';
+                        break;
+                    case 'station-id':
+                        scriptText = 'You\'re listening to Grace Waves Christian Radio, where faith flows through the airwaves. Your source for uplifting music, inspirational teaching, and spiritual encouragement throughout your day.';
+                        break;
+                    case 'devotional':
+                        scriptText = 'Devotional Moment: In the hustle of daily life, finding moments of peace can seem impossible. Jesus reminded us in Matthew 11:28, "Come to me, all you who are weary and burdened, and I will give you rest." Today, take a moment to surrender your burdens to Him. He doesn\'t promise to remove all challenges, but He does promise to walk through them with you. Let His presence be your peace today.';
+                        break;
+                }
+                
+                // Display the mock announcement
+                announcementScript.textContent = scriptText;
+                audioElement.src = '../uploads/tts/sample-announcement.mp3'; // This would need a real file path in production
+                downloadAudioLink.href = '../uploads/tts/sample-announcement.mp3';
+                
+                // Show the preview section
+                announcementPreview.style.display = 'block';
+                
+                // Scroll to preview
+                announcementPreview.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Initialize
+            checkAuth();
+            fetchShows();
+        });
+    </script>
+</body>
+</html>
