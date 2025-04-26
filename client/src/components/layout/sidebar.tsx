@@ -9,7 +9,8 @@ import {
   FileImage, 
   LineChart, 
   Settings,
-  LogOut
+  LogOut,
+  Mic
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -52,6 +53,7 @@ export default function Sidebar({ mobile = false, onClose }: { mobile?: boolean,
     { icon: <Headphones size={24} />, label: "Shows", href: "/shows" },
     { icon: <FileImage size={24} />, label: "Media", href: "/media" },
     { icon: <LineChart size={24} />, label: "Analytics", href: "/analytics" },
+    { icon: <Mic size={24} />, label: "Voice Announcements", href: "/voice-announcements" },
     { icon: <Settings size={24} />, label: "Settings", href: "/settings" },
   ];
   
