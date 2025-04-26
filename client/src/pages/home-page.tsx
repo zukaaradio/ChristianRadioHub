@@ -34,9 +34,9 @@ export default function HomePage() {
     return { ...schedule, show };
   }).slice(0, 3);
 
-  const formatDateTime = (dateString: string): string => {
+  const formatDateTime = (dateString: string | Date): string => {
     try {
-      const date = new Date(dateString);
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
       return format(date, 'MMM d, yyyy h:mm a');
     } catch (error) {
       return 'Invalid date';
@@ -44,7 +44,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-primary-800 text-white">
         <div className="container mx-auto px-4 py-6">
@@ -75,11 +75,11 @@ export default function HomePage() {
       </section>
 
       {/* Current Show Section */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-card">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Now Playing</h2>
-            <div className="scripture font-serif text-lg text-gray-600 italic mt-2">
+            <h2 className="text-3xl font-bold text-foreground">Now Playing</h2>
+            <div className="scripture font-serif text-lg text-muted-foreground italic mt-2">
               "Let everything that has breath praise the Lord." — Psalm 150:6
             </div>
           </div>
@@ -111,9 +111,9 @@ export default function HomePage() {
       </section>
 
       {/* Upcoming Shows Section */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Shows</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Upcoming Shows</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {schedulesWithShows && schedulesWithShows.length > 0 ? (
@@ -125,16 +125,16 @@ export default function HomePage() {
                         <Music className="h-6 w-6 text-primary-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{schedule.show?.title || `Show #${schedule.showId}`}</h3>
-                        <p className="text-sm text-gray-500">Host: {schedule.show?.host || "Unknown host"}</p>
+                        <h3 className="font-semibold text-foreground">{schedule.show?.title || `Show #${schedule.showId}`}</h3>
+                        <p className="text-sm text-muted-foreground">Host: {schedule.show?.host || "Unknown host"}</p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="flex items-center text-sm">
-                        <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>{formatDateTime(schedule.startTime)}</span>
+                        <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="text-muted-foreground">{formatDateTime(schedule.startTime)}</span>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-3">
+                      <p className="text-sm text-muted-foreground line-clamp-3">
                         {schedule.show?.description || "No description available"}
                       </p>
                     </div>
@@ -142,8 +142,8 @@ export default function HomePage() {
                 </Card>
               ))
             ) : (
-              <div className="col-span-full text-center py-10 text-gray-500">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="col-span-full text-center py-10 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-30" />
                 <p>No upcoming shows scheduled at the moment.</p>
               </div>
             )}
