@@ -45,6 +45,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
   
+  // Set up public routes before authentication middleware
+  // Public API (doesn't require authentication)
+  app.get("/api/public/current-stream", async (req, res) => {
+    try {
+      const stream = await storage.getActiveStream();
+      if (!stream) {
+        return res.status(404).json({ message: "No active stream found" });
+      }
+      
+      // Get current show information if available
+      const now = new Date();
+      const schedules = await storage.getAllSchedules();
+      const currentSchedule = schedules.find(schedule => {
+        const start = new Date(schedule.startTime);
+        const end = new Date(schedule.endTime);
+        return start <= now && end >= now;
+      });
+      
+      let show = undefined;
+      if (currentSchedule) {
+        show = await storage.getShow(currentSchedule.showId);
+      }
+      
+      res.json({
+        stream,
+        currentShow: show
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching current stream", error: (error as Error).message });
+    }
+  });
+  
+  app.post("/api/public/listener-stat", async (req, res) => {
+    try {
+      // Record a listener statistic
+      const { streamId, location, device, listenTime, ipAddress } = req.body;
+      
+      const stat = await storage.addListenerStat({
+        streamId,
+        location,
+        device,
+        listenTime,
+        ipAddress,
+        timestamp: new Date()
+      });
+      
+      res.status(201).json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Error recording listener stat", error: (error as Error).message });
+    }
+  });
+
   // All routes below this middleware require authentication
   app.use("/api/*", (req, res, next) => {
     if (!req.isAuthenticated()) {
