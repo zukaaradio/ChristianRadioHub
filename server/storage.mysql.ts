@@ -63,30 +63,55 @@ export interface IStorage {
   initializeDefaultData(): Promise<void>;
 }
 
-// Create MySQL session store
-const MySQLStore = mysqlStoreFactory(session);
+import { log } from './vite';
+
+// Check if we're in development environment on Replit
+const isDevEnvironment = process.env.NODE_ENV === 'development' && process.env.REPL_ID;
+
+// Create appropriate session store based on environment
+let SessionStore;
+if (isDevEnvironment) {
+  // For development on Replit, use in-memory session store
+  const createMemoryStore = require('memorystore');
+  SessionStore = createMemoryStore(session);
+  log('Using in-memory session store for development');
+} else {
+  // For production on your server, use MySQL session store
+  SessionStore = mysqlStoreFactory(session);
+  log('Using MySQL session store for production');
+}
 
 export class MySQLStorage implements IStorage {
   public sessionStore: session.Store;
   
   constructor() {
-    this.sessionStore = new MySQLStore({
-      // MySQL connection options
-      host: process.env.MYSQL_HOST || 'localhost',
-      port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || 'password',
-      database: process.env.MYSQL_DATABASE || 'radiodb',
-      createDatabaseTable: true,
-      schema: {
-        tableName: 'sessions',
-        columnNames: {
-          session_id: 'session_id',
-          expires: 'expires',
-          data: 'data'
+    if (isDevEnvironment) {
+      // In-memory session store for development
+      this.sessionStore = new SessionStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+      });
+      log('Created in-memory session store');
+    } else {
+      // MySQL session store for production
+      this.sessionStore = new SessionStore({
+        // MySQL connection options
+        host: process.env.MYSQL_HOST || 'localhost',
+        port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
+        user: process.env.MYSQL_USER || 'root',
+        password: process.env.MYSQL_PASSWORD || 'password',
+        database: process.env.MYSQL_DATABASE || 'radiodb',
+        createDatabaseTable: true,
+        schema: {
+          tableName: 'sessions',
+          columnNames: {
+            session_id: 'session_id',
+            expires: 'expires',
+            data: 'data'
+          }
         }
-      }
-    });
+      });
+      log('Created MySQL session store');
+    }
   }
   
   async initializeDefaultData(): Promise<void> {
