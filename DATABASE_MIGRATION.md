@@ -1,37 +1,22 @@
-# Database Migration Guide: PostgreSQL to MySQL
+# MySQL Database Configuration Guide
 
-This application has been set up to support both PostgreSQL and MySQL. By default, it uses PostgreSQL for backward compatibility, but you can easily switch to MySQL when you're ready to run your own migrations.
+This application now uses MySQL exclusively for database storage. This guide explains how to configure and run the application with your own MySQL server.
 
-## How to Switch to MySQL
+## MySQL Connection Configuration
 
-1. Set the environment variable `USE_MYSQL=true` to switch to MySQL mode
-2. Configure MySQL connection parameters using the following environment variables:
-   - `MYSQL_HOST` - Hostname for MySQL (default: 'localhost')
-   - `MYSQL_PORT` - Port for MySQL (default: 3306)
-   - `MYSQL_USER` - MySQL username (default: 'root')
-   - `MYSQL_PASSWORD` - MySQL password (default: 'password')
-   - `MYSQL_DATABASE` - MySQL database name (default: 'radiodb')
+Configure your MySQL connection by setting these environment variables:
 
-## Running Your Own Migrations
+- `MYSQL_HOST` - Your MySQL server hostname (default: 'localhost')
+- `MYSQL_PORT` - Your MySQL server port (default: 3306)
+- `MYSQL_USER` - Your MySQL username (default: 'root')
+- `MYSQL_PASSWORD` - Your MySQL password (default: 'password')
+- `MYSQL_DATABASE` - Your MySQL database name (default: 'radiodb')
 
-The codebase has been set up with the following schema and data files:
-
-- `shared/schema.ts` - PostgreSQL schema
-- `shared/schema.mysql.ts` - MySQL schema
-- `server/db.ts` - PostgreSQL database connection
-- `server/db.mysql.ts` - MySQL database connection
-- `server/storage.ts` - PostgreSQL storage implementation
-- `server/storage.mysql.ts` - MySQL storage implementation
-
-### Steps to Manage Your Own Migrations
-
-1. Create your migration scripts in a new `migrations` directory
-2. Use Drizzle's migration tools or write custom SQL scripts
-3. Reference the schema defined in `shared/schema.mysql.ts`
+You can set these in your environment or create a `.env` file in the project root.
 
 ## Schema Structure
 
-The application uses the following tables:
+The application uses the following MySQL tables:
 
 1. `users` - User accounts with authentication info
 2. `streams` - Radio stream configurations 
@@ -40,21 +25,41 @@ The application uses the following tables:
 5. `listener_stats` - Analytics for listener engagement
 6. `media_uploads` - Media file uploads
 7. `analytics` - Aggregated statistics
+8. `sessions` - Authentication session storage
 
-## Example Migration Script
+## Database Schema Creation
 
-Here's a simple example using pure SQL that you might create in your own migration process:
+We've included a schema generation script that you can use to set up your MySQL database:
 
-```sql
--- Example migration: Add a new field to the shows table
-ALTER TABLE shows ADD COLUMN category VARCHAR(100);
+```bash
+# Generate the schema SQL
+node mysql-schema.js > schema.sql
+
+# Apply the schema to your database
+mysql -u your_username -p radiodb < schema.sql
 ```
 
-## Storage Interface
+## Managing Your Own Migrations
 
-All database operations are performed through the `IStorage` interface, which is implemented by both `DatabaseStorage` (PostgreSQL) and `MySQLStorage` (MySQL). This ensures that your application code remains database-agnostic.
+Since you'll be running this on your own server, you'll need to manage your own database migrations. We recommend:
 
-The `db-adapter.ts` file handles switching between implementations based on the `USE_MYSQL` environment variable.
+1. Creating a `migrations` directory to store your migration scripts
+2. Using the `migrations` table (included in the schema) to track applied migrations
+3. Creating timestamped migration files for each schema change
+
+Example migration script format:
+
+```sql
+-- 001_add_category_to_shows.sql
+ALTER TABLE shows ADD COLUMN category VARCHAR(100);
+INSERT INTO migrations (name) VALUES ('001_add_category_to_shows');
+```
+
+## Application Database Connection
+
+The application connects to your MySQL database via the settings in `server/db.mysql.ts`.
+
+When deploying to production, ensure your environment variables are properly set on your server and that your MySQL server allows connections from your application server.
 
 ## Best Practices
 
@@ -63,4 +68,6 @@ The `db-adapter.ts` file handles switching between implementations based on the 
 3. Consider implementing a rollback strategy for each migration
 4. Document all schema changes and the reasons for them
 
-If you need assistance with specific migration tasks, please check the Drizzle ORM documentation or consult with your database administrator.
+For more detailed information on managing your MySQL database, please refer to:
+- `MYSQL_SERVER_DEPLOYMENT.md` - For deploying on your own server
+- `MYSQL_MANAGEMENT.md` - For day-to-day database management

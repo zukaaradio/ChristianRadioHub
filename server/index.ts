@@ -2,11 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
-// Use the DB adapter to choose between PostgreSQL and MySQL
-import { getDatabaseStorage } from "./db-adapter";
-
-// Get the appropriate storage implementation
-const storage = getDatabaseStorage();
+// Use MySQL storage exclusively
+import { storage } from "./storage.mysql";
 
 const app = express();
 app.use(express.json());
