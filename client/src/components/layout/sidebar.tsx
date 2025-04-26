@@ -26,14 +26,14 @@ interface NavItemProps {
 function NavItem({ icon, label, href, active }: NavItemProps) {
   return (
     <Link href={href}>
-      <a className={`group flex items-center px-2 py-2 text-base rounded-md ${
+      <div className={`group flex items-center px-2 py-2 text-base rounded-md cursor-pointer ${
         active 
           ? "text-white bg-primary-800" 
           : "text-blue-100 hover:text-white hover:bg-primary-700"
       }`}>
         <span className="mr-4 h-6 w-6">{icon}</span>
         {label}
-      </a>
+      </div>
     </Link>
   );
 }
