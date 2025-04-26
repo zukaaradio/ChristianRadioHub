@@ -12,6 +12,6 @@ const connectionPool = mysql.createPool({
   connectionLimit: 10
 });
 
-// Create drizzle ORM instance
-export const db = drizzle(connectionPool, { schema });
+// Create drizzle ORM instance - with proper mode parameter
+export const db = drizzle(connectionPool, { schema, mode: 'default' });
 export const pool = connectionPool;

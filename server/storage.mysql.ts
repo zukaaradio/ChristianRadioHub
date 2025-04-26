@@ -95,7 +95,7 @@ export class MySQLStorage implements IStorage {
     if (existingUsers.length > 0) return;
     
     // Create a default admin user
-    await this.createUser({
+    const adminUser = await this.createUser({
       username: "admin",
       password: "$2b$10$iZ/LHDJXMwhpQOEsAKP8C.ld1JKUvM0dMUrwNu/SB4QjjULx6W1Ei", // "password"
       fullName: "Admin User",
@@ -103,7 +103,7 @@ export class MySQLStorage implements IStorage {
     });
     
     // Create a default stream
-    await this.createStream({
+    const defaultStream = await this.createStream({
       title: "Grace Waves Christian Radio",
       streamUrl: "https://radio.brentwooddrivesda.org/listen/bwd_radio/radio.mp3",
       description: "Live Christian music, sermons, and inspirational programming dedicated to spreading God's word.",
@@ -202,12 +202,17 @@ export class MySQLStorage implements IStorage {
   }
   
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    // For MySQL, we need to insert first and then get the record
+    const result = await db.insert(users).values(insertUser);
+    const insertId = Number(result.insertId);
+    const [user] = await db.select().from(users).where(eq(users.id, insertId));
     return user;
   }
   
   async createStream(insertStream: InsertStream): Promise<Stream> {
-    const [stream] = await db.insert(streams).values(insertStream).returning();
+    const result = await db.insert(streams).values(insertStream);
+    const insertId = Number(result.insertId);
+    const [stream] = await db.select().from(streams).where(eq(streams.id, insertId));
     return stream;
   }
   
@@ -226,16 +231,17 @@ export class MySQLStorage implements IStorage {
   }
   
   async updateStream(id: number, streamUpdate: Partial<InsertStream>): Promise<Stream | undefined> {
-    const [stream] = await db.update(streams)
+    await db.update(streams)
       .set(streamUpdate)
-      .where(eq(streams.id, id))
-      .returning();
-    return stream;
+      .where(eq(streams.id, id));
+    
+    // Get the updated record
+    return this.getStream(id);
   }
   
   async deleteStream(id: number): Promise<boolean> {
-    const [deleted] = await db.delete(streams).where(eq(streams.id, id)).returning();
-    return !!deleted;
+    const result = await db.delete(streams).where(eq(streams.id, id));
+    return result.rowsAffected > 0;
   }
   
   async setStreamActive(id: number, active: boolean): Promise<boolean> {
@@ -243,16 +249,17 @@ export class MySQLStorage implements IStorage {
     await db.update(streams).set({ isActive: false });
     
     // Then set the target stream to active
-    const [stream] = await db.update(streams)
+    const result = await db.update(streams)
       .set({ isActive: active })
-      .where(eq(streams.id, id))
-      .returning();
+      .where(eq(streams.id, id));
     
-    return !!stream;
+    return result.rowsAffected > 0;
   }
   
   async createShow(insertShow: InsertShow): Promise<Show> {
-    const [show] = await db.insert(shows).values(insertShow).returning();
+    const result = await db.insert(shows).values(insertShow);
+    const insertId = Number(result.insertId);
+    const [show] = await db.select().from(shows).where(eq(shows.id, insertId));
     return show;
   }
   
@@ -266,20 +273,22 @@ export class MySQLStorage implements IStorage {
   }
   
   async updateShow(id: number, showUpdate: Partial<InsertShow>): Promise<Show | undefined> {
-    const [show] = await db.update(shows)
+    await db.update(shows)
       .set(showUpdate)
-      .where(eq(shows.id, id))
-      .returning();
-    return show;
+      .where(eq(shows.id, id));
+    
+    return this.getShow(id);
   }
   
   async deleteShow(id: number): Promise<boolean> {
-    const [deleted] = await db.delete(shows).where(eq(shows.id, id)).returning();
-    return !!deleted;
+    const result = await db.delete(shows).where(eq(shows.id, id));
+    return result.rowsAffected > 0;
   }
   
   async createSchedule(insertSchedule: InsertSchedule): Promise<Schedule> {
-    const [schedule] = await db.insert(schedules).values(insertSchedule).returning();
+    const result = await db.insert(schedules).values(insertSchedule);
+    const insertId = Number(result.insertId);
+    const [schedule] = await db.select().from(schedules).where(eq(schedules.id, insertId));
     return schedule;
   }
   
@@ -304,20 +313,22 @@ export class MySQLStorage implements IStorage {
   }
   
   async updateSchedule(id: number, scheduleUpdate: Partial<InsertSchedule>): Promise<Schedule | undefined> {
-    const [schedule] = await db.update(schedules)
+    await db.update(schedules)
       .set(scheduleUpdate)
-      .where(eq(schedules.id, id))
-      .returning();
-    return schedule;
+      .where(eq(schedules.id, id));
+    
+    return this.getSchedule(id);
   }
   
   async deleteSchedule(id: number): Promise<boolean> {
-    const [deleted] = await db.delete(schedules).where(eq(schedules.id, id)).returning();
-    return !!deleted;
+    const result = await db.delete(schedules).where(eq(schedules.id, id));
+    return result.rowsAffected > 0;
   }
   
   async addListenerStat(insertStat: InsertListenerStat): Promise<ListenerStat> {
-    const [stat] = await db.insert(listenerStats).values(insertStat).returning();
+    const result = await db.insert(listenerStats).values(insertStat);
+    const insertId = Number(result.insertId);
+    const [stat] = await db.select().from(listenerStats).where(eq(listenerStats.id, insertId));
     return stat;
   }
   
@@ -387,12 +398,9 @@ export class MySQLStorage implements IStorage {
   }
   
   async addMediaUpload(insertMedia: InsertMediaUpload): Promise<MediaUpload> {
-    const mediaWithDate = {
-      ...insertMedia,
-      uploadDate: new Date()
-    };
-    
-    const [media] = await db.insert(mediaUploads).values(mediaWithDate).returning();
+    const result = await db.insert(mediaUploads).values(insertMedia);
+    const insertId = Number(result.insertId);
+    const [media] = await db.select().from(mediaUploads).where(eq(mediaUploads.id, insertId));
     return media;
   }
   
@@ -406,12 +414,14 @@ export class MySQLStorage implements IStorage {
   }
   
   async deleteMediaUpload(id: number): Promise<boolean> {
-    const [deleted] = await db.delete(mediaUploads).where(eq(mediaUploads.id, id)).returning();
-    return !!deleted;
+    const result = await db.delete(mediaUploads).where(eq(mediaUploads.id, id));
+    return result.rowsAffected > 0;
   }
   
   async addAnalytic(insertAnalytic: InsertAnalytic): Promise<Analytic> {
-    const [analytic] = await db.insert(analytics).values(insertAnalytic).returning();
+    const result = await db.insert(analytics).values(insertAnalytic);
+    const insertId = Number(result.insertId);
+    const [analytic] = await db.select().from(analytics).where(eq(analytics.id, insertId));
     return analytic;
   }
   

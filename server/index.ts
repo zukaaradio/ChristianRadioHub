@@ -2,7 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
-import { storage } from "./storage";
+// Use MySQL storage instead of PostgreSQL
+import { storage } from "./storage.mysql";
 
 const app = express();
 app.use(express.json());
