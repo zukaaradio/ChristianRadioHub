@@ -1,9 +1,13 @@
-import { users, type User, type InsertUser, streams, type Stream, type InsertStream, shows, type Show, type InsertShow, schedules, type Schedule, type InsertSchedule, listenerStats, type ListenerStat, type InsertListenerStat, mediaUploads, type MediaUpload, type InsertMediaUpload, analytics, type Analytic, type InsertAnalytic } from "@shared/schema";
-import { db } from "./db";
+import { 
+  User, Stream, Show, Schedule, ListenerStat, MediaUpload, Analytic, 
+  type InsertUser, type InsertStream, type InsertShow, type InsertSchedule, 
+  type InsertListenerStat, type InsertMediaUpload, type InsertAnalytic,
+  users, streams, shows, schedules, listenerStats, mediaUploads, analytics
+} from "@shared/schema.mysql";
+import { db, pool } from "./db.mysql";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
-import connectPg from "connect-pg-simple";
 import session from "express-session";
-import { pool } from "./db";
+import mysqlStoreFactory from "express-mysql-session";
 
 export interface IStorage {
   // User management
@@ -59,15 +63,29 @@ export interface IStorage {
   initializeDefaultData(): Promise<void>;
 }
 
-const PostgresSessionStore = connectPg(session);
+// Create MySQL session store
+const MySQLStore = mysqlStoreFactory(session);
 
-export class DatabaseStorage implements IStorage {
+export class MySQLStorage implements IStorage {
   public sessionStore: session.Store;
   
   constructor() {
-    this.sessionStore = new PostgresSessionStore({ 
-      pool, 
-      createTableIfMissing: true 
+    this.sessionStore = new MySQLStore({
+      // MySQL connection options
+      host: process.env.MYSQL_HOST || 'localhost',
+      port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || 'password',
+      database: process.env.MYSQL_DATABASE || 'radiodb',
+      createDatabaseTable: true,
+      schema: {
+        tableName: 'sessions',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      }
     });
   }
   
@@ -419,4 +437,5 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Export an instance of the MySQL storage
+export const storage = new MySQLStorage();
