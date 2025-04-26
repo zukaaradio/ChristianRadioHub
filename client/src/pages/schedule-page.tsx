@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useSearch } from "wouter";
 import { Schedule, Show } from "@shared/schema";
@@ -114,7 +114,7 @@ export default function SchedulePage() {
   });
   
   // Update form when schedule data is loaded
-  React.useEffect(() => {
+  useEffect(() => {
     if (schedule) {
       form.reset({
         showId: schedule.showId,
