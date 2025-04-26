@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import RadioPlayer from "@/components/player/radio-player";
+import EnhancedRadioPlayer from "@/components/player/enhanced-radio-player";
 import { User, Music, Calendar, Clock, ChevronRight } from "lucide-react";
 import { Stream, Show, Schedule } from "@shared/schema";
 import { format } from "date-fns";
@@ -70,7 +70,7 @@ export default function HomePage() {
       {/* Radio Player Section */}
       <section className="py-6 border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <RadioPlayer />
+          <EnhancedRadioPlayer />
         </div>
       </section>
 

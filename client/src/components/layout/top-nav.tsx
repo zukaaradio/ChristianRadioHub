@@ -22,10 +22,10 @@ export default function TopNav() {
   const { user } = useAuth();
   
   return (
-    <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+    <div className="relative z-10 flex-shrink-0 flex h-16 bg-background shadow">
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden px-4 text-gray-500">
+          <Button variant="ghost" size="icon" className="md:hidden px-4 text-foreground">
             <span className="sr-only">Open sidebar</span>
             <Menu className="h-6 w-6" />
           </Button>
@@ -41,9 +41,9 @@ export default function TopNav() {
             <label htmlFor="search-field" className="sr-only">
               Search
             </label>
-            <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+            <div className="relative w-full text-muted-foreground focus-within:text-foreground">
               <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5" />
               </div>
               <Input
                 id="search-field"
@@ -61,7 +61,7 @@ export default function TopNav() {
           <Button
             variant="ghost"
             size="icon"
-            className="p-1 rounded-full text-gray-400 hover:text-gray-500"
+            className="p-1 rounded-full text-muted-foreground hover:text-foreground"
           >
             <span className="sr-only">View notifications</span>
             <Bell className="h-6 w-6" />
