@@ -3,9 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grace Waves Radio</title>
+    <title>Grace Waves Christian Radio</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Hero section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('images/worship-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 5rem 1rem;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #e0e5ff 0%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Featured content */
+        .featured-section {
+            padding: 4rem 1rem;
+            background-color: var(--white);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .show-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .show-card {
+            background-color: var(--white);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .show-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .show-image {
+            height: 200px;
+            background-color: var(--gray-300);
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .show-content {
+            padding: 1.5rem;
+        }
+        
+        .show-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .show-host {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .show-description {
+            margin-bottom: 1.5rem;
+            color: var(--gray-700);
+        }
+        
+        .show-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* About section */
+        .about-section {
+            padding: 4rem 1rem;
+            background-color: var(--gray-100);
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-image {
+            flex: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .scripture-quote {
+            font-style: italic;
+            padding: 1.5rem;
+            background-color: var(--white);
+            border-left: 4px solid var(--primary);
+            margin: 2rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        .scripture-reference {
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 0.5rem;
+            display: block;
+        }
+        
+        /* Features section */
+        .features-section {
+            padding: 4rem 1rem;
+            background-color: var(--white);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        /* Newsletter section */
+        .newsletter-section {
+            padding: 4rem 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            margin-top: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.25rem 0 0 0.25rem;
+            font-size: 1rem;
+        }
+        
+        .newsletter-form button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--white);
+            color: var(--primary);
+            border: none;
+            border-radius: 0 0.25rem 0.25rem 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .newsletter-form button:hover {
+            background-color: var(--gray-200);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .newsletter-form input,
+            .newsletter-form button {
+                width: 100%;
+                border-radius: 0.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,80 +301,317 @@
                 <h1>Grace Waves Radio</h1>
             </div>
             <nav>
-                <ul>
-                    <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="admin/login.html"><i class="fas fa-user"></i> Admin Login</a></li>
+                <ul class="main-menu">
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#shows">Shows</a></li>
+                    <li><a href="#schedule">Schedule</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
+            <a href="admin/login.html" class="btn outline">Admin Login</a>
         </header>
 
-        <main>
-            <section class="hero">
-                <div class="hero-content">
-                    <h2>Spreading God's Word Through The Airwaves</h2>
-                    <p>Tune in for inspiring Christian music, sermons, and programming 24/7</p>
-                    <button class="btn primary" id="listen-now">Listen Now</button>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Faith Flowing Through The Airwaves</h1>
+                <p>Tune in to Grace Waves Christian Radio for uplifting music, inspiring messages, and spiritual encouragement throughout your day.</p>
+                <div class="hero-buttons">
+                    <a href="#player" class="btn primary">Listen Live</a>
+                    <a href="#schedule" class="btn outline">View Schedule</a>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="player-container" id="player-section" style="display: none;">
-                <div class="radio-player">
-                    <h3>Currently Playing</h3>
-                    <div class="stream-info">
-                        <div class="stream-title" id="stream-title">Grace Waves Christian Radio</div>
-                        <div class="show-info" id="show-info">Morning Devotional with Pastor David Johnson</div>
-                    </div>
-                    <div class="controls">
-                        <button id="play-pause" class="btn"><i class="fas fa-play"></i></button>
-                        <div class="volume-control">
-                            <i class="fas fa-volume-up"></i>
-                            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.7">
+        <div class="player-controls" id="player">
+            <button class="play-btn" id="play-btn">
+                <i class="fas fa-play" id="play-icon"></i>
+            </button>
+            <div class="volume-control">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" min="0" max="100" value="80" class="volume-slider" id="volume-slider">
+            </div>
+            <div class="now-playing">
+                <h3>Now Playing</h3>
+                <p id="current-show">Loading stream information...</p>
+            </div>
+        </div>
+
+        <section class="featured-section" id="shows">
+            <div class="section-title">
+                <h2>Our Featured Shows</h2>
+                <p>Discover our most popular Christian programs</p>
+            </div>
+            <div class="show-grid" id="shows-container">
+                <!-- Shows will be populated by JavaScript -->
+                <div class="show-card">
+                    <div class="show-image" style="background-image: url('images/morning-devotional.jpg');"></div>
+                    <div class="show-content">
+                        <h3 class="show-title">Morning Devotional</h3>
+                        <div class="show-host">
+                            <i class="fas fa-user"></i>
+                            <span>Pastor David Johnson</span>
+                        </div>
+                        <p class="show-description">Start your day with biblical insights, prayer, and spiritual reflection to guide you throughout your day.</p>
+                        <div class="show-time">
+                            <i class="far fa-clock"></i>
+                            <span>Weekdays 6:00 AM - 7:00 AM</span>
                         </div>
                     </div>
-                    <audio id="audio-player" src="https://radio.brentwooddrivesda.org/listen/bwd_radio/radio.mp3"></audio>
                 </div>
-            </section>
+                
+                <div class="show-card">
+                    <div class="show-image" style="background-image: url('images/gospel-hour.jpg');"></div>
+                    <div class="show-content">
+                        <h3 class="show-title">Gospel Hour</h3>
+                        <div class="show-host">
+                            <i class="fas fa-user"></i>
+                            <span>Sister Mary Thompson</span>
+                        </div>
+                        <p class="show-description">Enjoy the rich sounds of traditional and contemporary gospel music that will lift your spirit and heart.</p>
+                        <div class="show-time">
+                            <i class="far fa-clock"></i>
+                            <span>Sundays 10:00 AM - 12:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="show-card">
+                    <div class="show-image" style="background-image: url('images/biblical-insights.jpg');"></div>
+                    <div class="show-content">
+                        <h3 class="show-title">Biblical Insights</h3>
+                        <div class="show-host">
+                            <i class="fas fa-user"></i>
+                            <span>Dr. Robert Winters</span>
+                        </div>
+                        <p class="show-description">Deep dive into Scripture with theological discussions and practical applications for modern Christian living.</p>
+                        <div class="show-time">
+                            <i class="far fa-clock"></i>
+                            <span>Wednesdays 7:00 PM - 8:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            <section class="schedule">
-                <h2>Upcoming Shows</h2>
-                <div class="schedule-list" id="upcoming-shows">
-                    <!-- Will be populated by JavaScript -->
+        <section class="about-section" id="about">
+            <div class="section-title">
+                <h2>About Our Ministry</h2>
+                <p>Spreading God's word through the airwaves</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Grace Waves Christian Radio was founded with a vision to spread God's word and love through the airwaves, reaching hearts and homes with uplifting content that encourages, inspires, and strengthens faith.</p>
+                    
+                    <div class="scripture-quote">
+                        "How beautiful are the feet of those who bring good news!" 
+                        <span class="scripture-reference">Romans 10:15</span>
+                    </div>
+                    
+                    <p>Our mission is to provide quality Christian programming that ministers to the spiritual needs of our listeners. Through music, teaching, and inspirational messages, we aim to be a source of encouragement and spiritual growth for believers and a welcoming introduction to the Christian faith for seekers.</p>
+                    
+                    <p>With a dedicated team of hosts, producers, and volunteers, we work diligently to create content that glorifies God and serves our community.</p>
                 </div>
-            </section>
-        </main>
+                <div class="about-image">
+                    <img src="images/radio-studio.jpg" alt="Grace Waves Radio Studio">
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="section-title">
+                <h2>What We Offer</h2>
+                <p>Our commitment to excellence in Christian broadcasting</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="feature-title">Uplifting Music</h3>
+                    <p class="feature-description">Carefully curated Christian music spanning various genres from traditional hymns to contemporary worship.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book-bible"></i>
+                    </div>
+                    <h3 class="feature-title">Biblical Teaching</h3>
+                    <p class="feature-description">Deep, relevant, and practical Bible teaching from respected pastors and teachers.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-praying-hands"></i>
+                    </div>
+                    <h3 class="feature-title">Prayer Support</h3>
+                    <p class="feature-description">Call-in prayer lines and regular prayer segments to support our community's spiritual needs.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Community Focus</h3>
+                    <p class="feature-description">Highlighting local church events, ministries, and community service opportunities.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter-section" id="contact">
+            <div class="newsletter-content">
+                <h2>Stay Connected</h2>
+                <p>Subscribe to our newsletter for updates on shows, special broadcasts, and inspirational content.</p>
+                <form class="newsletter-form" id="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </section>
 
         <footer>
             <div class="footer-content">
-                <div class="footer-logo">
-                    <i class="fas fa-cross"></i>
+                <div class="footer-section">
                     <h3>Grace Waves Radio</h3>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="schedule.html">Schedule</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-social">
-                    <h4>Connect With Us</h4>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    <p>Broadcasting God's love and grace through the airwaves to inspire, encourage, and strengthen your faith journey.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#shows">Shows</a></li>
+                        <li><a href="#schedule">Schedule</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="admin/login.html">Admin</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Faith Street, Graceville, CA 90000</p>
+                    <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@gracewavesradio.org</p>
+                </div>
             </div>
+            
             <div class="footer-bottom">
-                <p>&copy; 2025 Grace Waves Radio. All Rights Reserved.</p>
+                <p>&copy; 2025 Grace Waves Christian Radio. All Rights Reserved.</p>
             </div>
         </footer>
     </div>
 
-    <script src="js/player.js"></script>
-    <script src="js/schedule.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const playBtn = document.getElementById('play-btn');
+            const playIcon = document.getElementById('play-icon');
+            const volumeSlider = document.getElementById('volume-slider');
+            const currentShowElement = document.getElementById('current-show');
+            
+            // Create audio element
+            const audio = new Audio();
+            audio.preload = 'auto';
+            
+            // Set initial volume
+            audio.volume = volumeSlider.value / 100;
+            
+            // Get stream info
+            async function fetchCurrentStream() {
+                try {
+                    const response = await fetch('api/public/current-stream.php');
+                    if(!response.ok) {
+                        throw new Error('Failed to fetch stream data');
+                    }
+                    
+                    const data = await response.json();
+                    if(data && data.stream) {
+                        audio.src = data.stream.streamUrl;
+                        currentShowElement.textContent = data.stream.title;
+                        
+                        // Check if we should also display current show
+                        if(data.currentShow) {
+                            currentShowElement.textContent = `${data.stream.title} - ${data.currentShow.title} with ${data.currentShow.host}`;
+                        }
+                    } else {
+                        currentShowElement.textContent = 'No stream available';
+                    }
+                    
+                } catch(error) {
+                    console.error('Error fetching stream:', error);
+                    currentShowElement.textContent = 'Error loading stream information';
+                    
+                    // Use default stream for development
+                    audio.src = 'https://radio.brentwooddrivesda.org/listen/bwd_radio/radio.mp3';
+                    currentShowElement.textContent = 'Grace Waves Christian Radio';
+                }
+            }
+            
+            // Toggle play/pause
+            function togglePlayPause() {
+                if(audio.paused) {
+                    audio.play()
+                        .then(() => {
+                            playIcon.classList.remove('fa-play');
+                            playIcon.classList.add('fa-pause');
+                        })
+                        .catch(error => {
+                            console.error('Error playing audio:', error);
+                            alert('Error playing stream. Please try again.');
+                        });
+                } else {
+                    audio.pause();
+                    playIcon.classList.remove('fa-pause');
+                    playIcon.classList.add('fa-play');
+                }
+            }
+            
+            // Update volume
+            function setVolume() {
+                audio.volume = volumeSlider.value / 100;
+            }
+            
+            // Event listeners
+            playBtn.addEventListener('click', togglePlayPause);
+            volumeSlider.addEventListener('input', setVolume);
+            
+            // Fetch upcoming shows for homepage
+            async function fetchUpcomingShows() {
+                try {
+                    const response = await fetch('api/public/upcoming-shows.php');
+                    if(!response.ok) {
+                        throw new Error('Failed to fetch upcoming shows');
+                    }
+                    
+                    const data = await response.json();
+                    if(data && data.length > 0) {
+                        // Update show listings if needed
+                        // This is a placeholder for dynamic show updates
+                    }
+                } catch(error) {
+                    console.error('Error fetching upcoming shows:', error);
+                }
+            }
+            
+            // Handle newsletter form submission
+            const newsletterForm = document.getElementById('newsletter-form');
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input[type="email"]').value;
+                alert(`Thank you for subscribing with: ${email}. You'll receive our updates soon!`);
+                this.reset();
+            });
+            
+            // Initialize
+            fetchCurrentStream();
+            fetchUpcomingShows();
+        });
+    </script>
 </body>
 </html>
