@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Details - Grace Waves Christian Radio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/engagement.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <h1>Grace Waves</h1>
+                    <span>Christian Radio</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shows.html" class="active">Shows</a></li>
+                    <li><a href="schedule.html">Schedule</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="admin/login.html" class="login-button" id="login-button">Login</a>
+                <button class="nav-toggle" id="nav-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="show-detail-section">
+            <div class="container">
+                <div id="show-content" class="show-content">
+                    <!-- Show content will be loaded here -->
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading show details...</p>
+                    </div>
+                </div>
+                
+                <div class="engagement-bar">
+                    <button id="like-button" class="like-button">
+                        <i class="far fa-heart"></i> Like
+                    </button>
+                    <div class="like-count">
+                        <i class="fas fa-heart"></i>
+                        <span id="like-count">0</span> likes
+                    </div>
+                </div>
+                
+                <div id="comments-section" class="comments-section">
+                    <!-- Comments will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Grace Waves</h2>
+                    <p>Broadcasting Hope and Inspiration</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="shows.html">Shows</a></li>
+                        <li><a href="schedule.html">Schedule</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-subscribe">
+                    <h3>Stay Connected</h3>
+                    <p>Subscribe to our newsletter for updates</p>
+                    <form id="subscribe-form">
+                        <input type="email" placeholder="Your Email Address" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Grace Waves Christian Radio. All Rights Reserved.</p>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/shows.js"></script>
+    <script src="js/engagement.js"></script>
+    <script>
+        // Global variables for current user
+        let currentUserId = null;
+        let isAdmin = false;
+        
+        // Check login status
+        function checkLoginStatus() {
+            fetch('/api/user-status.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.loggedIn) {
+                        currentUserId = data.userId;
+                        isAdmin = data.role === 'admin';
+                        
+                        // Update login button
+                        const loginButton = document.getElementById('login-button');
+                        loginButton.textContent = 'Dashboard';
+                        loginButton.href = 'admin/dashboard.html';
+                    }
+                })
+                .catch(error => console.error('Error checking login status:', error));
+        }
+        
+        // Get show ID from URL
+        function getShowId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        // Load show details
+        async function loadShowDetails() {
+            const showId = getShowId();
+            if (!showId) {
+                window.location.href = 'shows.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/shows/read_single.php?id=${showId}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('show-content').innerHTML = `
+                        <div class="error-message">
+                            <h2>Show Not Found</h2>
+                            <p>${data.error}</p>
+                            <a href="shows.html" class="btn">Back to Shows</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Set page title
+                document.title = `${data.title} - Grace Waves Christian Radio`;
+                
+                // Render show details
+                document.getElementById('show-content').innerHTML = `
+                    <div class="show-header">
+                        <div class="show-image">
+                            <img src="${data.cover_image || 'images/default-show.jpg'}" alt="${data.title}">
+                        </div>
+                        <div class="show-info">
+                            <h1>${data.title}</h1>
+                            <p class="show-host">Hosted by ${data.host}</p>
+                            <div class="show-schedule">
+                                <p><i class="far fa-clock"></i> Schedule information will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="show-description">
+                        <h2>About This Show</h2>
+                        <p>${data.description || 'No description available.'}</p>
+                    </div>
+                    ${data.is_recorded ? `
+                        <div class="show-recording">
+                            <h2>Listen to Recording</h2>
+                            <audio controls src="${data.audio_file}">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // Initialize engagement features
+                EngagementLikes.initLikeButton('like-button', 'like-count', 'show', showId);
+                EngagementComments.initComments('comments-section', 'show', showId);
+                
+                // Load upcoming schedules for this show
+                loadShowSchedule(showId);
+                
+            } catch (error) {
+                console.error('Error loading show details:', error);
+                document.getElementById('show-content').innerHTML = `
+                    <div class="error-message">
+                        <h2>Error Loading Show</h2>
+                        <p>Unable to load show details. Please try again later.</p>
+                        <a href="shows.html" class="btn">Back to Shows</a>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load show schedule
+        async function loadShowSchedule(showId) {
+            try {
+                const response = await fetch(`/api/schedules/by_show.php?show_id=${showId}`);
+                const schedules = await response.json();
+                
+                const scheduleElement = document.querySelector('.show-schedule');
+                
+                if (schedules.length > 0) {
+                    let scheduleHtml = '<h3>Upcoming Episodes</h3><ul class="show-episodes">';
+                    
+                    schedules.forEach(schedule => {
+                        const startDate = new Date(schedule.start_time);
+                        const endDate = new Date(schedule.end_time);
+                        
+                        scheduleHtml += `
+                            <li>
+                                <div class="episode-date">
+                                    ${startDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                                </div>
+                                <div class="episode-time">
+                                    ${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - 
+                                    ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    
+                    scheduleHtml += '</ul>';
+                    scheduleElement.innerHTML = scheduleHtml;
+                } else {
+                    scheduleElement.innerHTML = '<p><i class="far fa-calendar-times"></i> No upcoming episodes scheduled</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading show schedule:', error);
+                const scheduleElement = document.querySelector('.show-schedule');
+                scheduleElement.innerHTML = '<p>Unable to load schedule information.</p>';
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+            loadShowDetails();
+        });
+    </script>
+</body>
+</html>
