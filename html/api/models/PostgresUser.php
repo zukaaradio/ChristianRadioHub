@@ -18,6 +18,25 @@ class PostgresUser {
         $this->conn = $database->connect();
     }
     
+    // Get all users
+    public function read() {
+        $query = 'SELECT 
+                    id, 
+                    username, 
+                    full_name,
+                    role,
+                    created_at
+                  FROM 
+                    ' . $this->table . '
+                  ORDER BY
+                    created_at DESC';
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        
+        return $stmt;
+    }
+    
     // Get a user by ID
     public function read_single() {
         $query = 'SELECT 
@@ -86,18 +105,17 @@ class PostgresUser {
         return false;
     }
     
-    // Create a new user
+    // Create a user
     public function create() {
         $query = 'INSERT INTO ' . $this->table . '
                   (username, password, full_name, role)
                   VALUES (:username, :password, :full_name, :role)
-                  RETURNING id, username, full_name, role, created_at';
+                  RETURNING id, created_at';
         
         $stmt = $this->conn->prepare($query);
         
         // Clean data
         $this->username = htmlspecialchars(strip_tags($this->username));
-        $this->password = htmlspecialchars(strip_tags($this->password));
         $this->full_name = htmlspecialchars(strip_tags($this->full_name));
         $this->role = htmlspecialchars(strip_tags($this->role));
         
@@ -122,14 +140,27 @@ class PostgresUser {
     
     // Update a user
     public function update() {
-        $query = 'UPDATE ' . $this->table . '
-                  SET
-                    username = :username,
-                    full_name = :full_name,
-                    role = :role
-                  WHERE
-                    id = :id
-                  RETURNING id, username, full_name, role, created_at';
+        // Check if password is being updated
+        if($this->password) {
+            $query = 'UPDATE ' . $this->table . '
+                      SET
+                        username = :username,
+                        password = :password,
+                        full_name = :full_name,
+                        role = :role
+                      WHERE
+                        id = :id
+                      RETURNING created_at';
+        } else {
+            $query = 'UPDATE ' . $this->table . '
+                      SET
+                        username = :username,
+                        full_name = :full_name,
+                        role = :role
+                      WHERE
+                        id = :id
+                      RETURNING created_at';
+        }
         
         $stmt = $this->conn->prepare($query);
         
@@ -141,6 +172,9 @@ class PostgresUser {
         
         // Bind data
         $stmt->bindParam(':username', $this->username);
+        if($this->password) {
+            $stmt->bindParam(':password', $this->password);
+        }
         $stmt->bindParam(':full_name', $this->full_name);
         $stmt->bindParam(':role', $this->role);
         $stmt->bindParam(':id', $this->id);
@@ -149,34 +183,6 @@ class PostgresUser {
         if($stmt->execute()) {
             $row = $stmt->fetch();
             $this->created_at = $row['created_at'];
-            return true;
-        }
-        
-        printf("Error: %s.\n", $stmt->error);
-        
-        return false;
-    }
-    
-    // Update password
-    public function update_password() {
-        $query = 'UPDATE ' . $this->table . '
-                  SET
-                    password = :password
-                  WHERE
-                    id = :id';
-        
-        $stmt = $this->conn->prepare($query);
-        
-        // Clean data
-        $this->password = htmlspecialchars(strip_tags($this->password));
-        $this->id = htmlspecialchars(strip_tags($this->id));
-        
-        // Bind data
-        $stmt->bindParam(':password', $this->password);
-        $stmt->bindParam(':id', $this->id);
-        
-        // Execute query
-        if($stmt->execute()) {
             return true;
         }
         
@@ -207,23 +213,31 @@ class PostgresUser {
         return false;
     }
     
-    // Get all users
-    public function read() {
-        $query = 'SELECT 
-                    id, 
-                    username, 
-                    full_name,
-                    role,
-                    created_at
-                  FROM 
-                    ' . $this->table . '
-                  ORDER BY
-                    created_at DESC';
+    // Update user password
+    public function update_password() {
+        $query = 'UPDATE ' . $this->table . '
+                  SET
+                    password = :password
+                  WHERE
+                    id = :id';
         
         $stmt = $this->conn->prepare($query);
-        $stmt->execute();
         
-        return $stmt;
+        // Clean data
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Bind data
+        $stmt->bindParam(':password', $this->password);
+        $stmt->bindParam(':id', $this->id);
+        
+        // Execute query
+        if($stmt->execute()) {
+            return true;
+        }
+        
+        printf("Error: %s.\n", $stmt->error);
+        
+        return false;
     }
 }
 ?>
